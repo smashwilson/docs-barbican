@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# barbican-worker - Script run Cloudkeep's Barbican worker app.
+
+python bin/barbican-worker.py
