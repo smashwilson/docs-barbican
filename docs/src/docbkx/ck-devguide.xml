@@ -5,7 +5,7 @@
   xmlns:svg="http://www.w3.org/2000/svg" version="5.0"
   xml:id="ck-devguide" status="DRAFT">
   <?rax canonical.url.base="http://docs.rackspace.com/keep/api/v1.0/ck-devguide/content"?>
-  <title>Barbican API Developer Guide</title>
+  <title>Rackspace Barbican API Developer Guide</title>
   <info>
     <copyright>
       <year>2014</year>
@@ -46,8 +46,8 @@
   </info>
   <chapter xml:id="Overview">
     <title>Overview</title>
-    <para>Barbican is a REST API that enables secure life-cycle
-      management of keys and credentials, called <emphasis
+    <para>Rackspace Barbican is a REST API that enables secure
+      life-cycle management of keys and credentials, called <emphasis
         role="italic">secrets</emphasis>, on behalf of customers. This
       is especially important for customers who want to securely store
       and retrieve credentials systematically, and enables customers
@@ -110,13 +110,13 @@
     <section xml:id="Secrets">
       <title>Secrets resource</title>
       <para>The secrets resource is the heart of the Barbican service.
-        It provides access to the secret / keying data that is stored
-        in the system. </para>
+        It provides access to the secret and keying data that is
+        stored in the system. </para>
       <para>The secret scheme represents the actual secret or key that
-        wil be presented to the application. Secrets can be of any
-        format, but additional functionality may be available for
-        known types of symmetric or asymmetric keys. The following
-        shows an example of a secret:</para>
+        is presented to the application. Secrets can be of any format,
+        but additional functionality may be available for known types
+        of symmetric or asymmetric keys. The following shows an
+        example of a secret:</para>
       <para>
         <programlisting>{
   "uuid": "e2b633c7-fda5-4be8-b42c-9a2c9280284d",
@@ -179,7 +179,9 @@
             <para>Submit a <command>POST</command> request without a
                 <replaceable>payload</replaceable> parameter against
               the secrets resource and then include the payload in a
-              subsequent <command>PUT</command> request.</para>
+              subsequent <command>PUT</command> request. This mode
+              enables you to upload a a binary file to the Barbican
+              database directly for encrypted storage.</para>
           </listitem>
         </itemizedlist>
       </para>
@@ -191,44 +193,43 @@
             request, then it is encrypted and stored, and then linked
             with this metadata. If no payload is included with the
               <command>POST</command> request, it must be provided
-            with a subsequent <command>PUT</command> request.
-            Generating a secret using the secret resource differs from
-            generating a secret via the orders resource. Creating a
-            secret through the secrets resource only generates secret
-            metadata. If you use the orders resource to create a
-            secret, Barbican generates the actual secret
-            information.</para>
+            with a subsequent <command>PUT</command> request. The
+            secret resource encrypts and stores client-provided secret
+            information and metadata. In contrast, the orders resource
+            generats actual secret information on behalf of
+            clients.</para>
         </note>
       </para>
       <section xml:id="Examples_of_Secrets">
         <title>Examples of secret combinations</title>
-        <para>This section outlines the different call flows you can
-          adhere to when creating secrets. Each call flow uses
-          different combinations for the content type and content
-          encoding parameters. The content type and content encoding
-          information is either in the
+        <para>This section outlines the different request sequences
+          you can adhere to when storing secrets. Each sequence uses
+          different combinations for the <emphasis role="italic"
+            >content type</emphasis> and <emphasis role="italic"
+            >content encoding</emphasis> fields. The content type and
+          content encoding information is specified either in the
             <parameter>payload_content_type</parameter> and
             <parameter>payload_content_encoding</parameter> parameters
-          or in the <parameter>Accept</parameter> or in the
-            <parameter>Content-type</parameter> headers.</para>
-        <para>The following call flow combinations are
-          possible:</para>
+          of a POST request or in the <parameter>Accept</parameter>
+          and <parameter>Content-type</parameter> headers of a GET
+          request.</para>
+        <para>The following request combinations are possible:</para>
         <para>
           <itemizedlist>
             <listitem>
-              <para>One-step flow to create and retrieve a secret
+              <para>One-step sequence to create and retrieve a secret
                 using UTF-8/ASCII format</para>
             </listitem>
             <listitem>
-              <para>One-step flow to create and retrieve a secret
+              <para>One-step sequence to create and retrieve a secret
                 using binary format</para>
             </listitem>
             <listitem>
-              <para>Two-step flow to create and retrieve a secret
+              <para>Two-step sequence to create and retrieve a secret
                 using binary format</para>
             </listitem>
             <listitem>
-              <para>One-step flow to create and retrieve a secret
+              <para>One-step sequence to create and retrieve a secret
                 using plain text format</para>
             </listitem>
           </itemizedlist>
