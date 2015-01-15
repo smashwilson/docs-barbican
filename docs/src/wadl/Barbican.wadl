@@ -35,7 +35,7 @@
 					<resource id="secret" path="/{secret_id}">
 						<param name="secret_id" style="template"
 							type="xsd:string">
-							<doc>Specifies the unique identifyer of a secret that has been stored.</doc>
+							<doc>This parameter specifies the unique identifier of a secret that has been stored.</doc>
 						</param>
 						<method href="#getSecretinfo"/>
 						<method href="#updateSecret"/>
@@ -52,8 +52,20 @@
 							<doc>Specifies the unique identifier of an order that has been created.</doc>
 						</param>
 						<method href="#getOrderInfo"/>
-						<method href="#updateOrder"
-							db:security="writeronly"/>
+					</resource>
+					<!-- CONTAINERS resource -->
+					<?rax start-sections?>
+					<resource id="containers" path="/containers">
+						<doc title="Containers"/>
+						<method href="#getContainer"/>
+						<method href="#createContainer"/>
+						<resource id="container" path="/{container_id}">
+							<param name="container_id" style="template"
+								type="xsd:string">
+								<doc>This parameter specifies the unique identifier of a container that has been stored.</doc>
+							</param>
+							<method href="#getContainerinfo"/>
+						</resource>
 					</resource>
 				</resource>
 			</resource>
@@ -163,7 +175,7 @@
 					provided, only the secret metadata will be
 					retrievable from Barbican and any attempt to
 					retrieve decrypted data for that secret will fail.
-					Defering the secret information to a PUT request
+					Deferring the secret information to a PUT request
 					is useful for secrets that are in binary format
 					and are not suitable for base64 encoding.
 				</wadl:doc>
@@ -459,56 +471,141 @@ The following values are supported:</para>
 		</response>
 		<response status="404">
 			<doc title="Error">This error code is returned when the
-				supplied UUID doesn't match a order in the data store,
+				supplied UUID doesn't match an order in the data store,
 				which means the order doesn't exist. </doc>
 		</response>
 	</method>
 	<!--*******************************************************-->
-	<!--               Update Order: updateOrder                 -->
+	<!--              Create Container: createContainer                -->
 	<!--*******************************************************-->
-	<method name="PUT" id="updateOrder" db:security="writeronly">
-		<wadl:doc xml:lang="EN" title="Update Order"
+	<method name="POST" id="createContainer">
+		<wadl:doc xml:lang="EN" title="Create Container"
 			xmlns="http://docbook.org/ns/docbook">
-			<para role="shortdesc">This method updates an order.</para>
+			<para role="shortdesc">This method allows a user to create a new container. Generic type containers can hold multiple references to secrets, each reference defining a relation name to the secret. RSA type containers can hold 3 secret references, named 'public_key', 'private_key', and 'private_key_passphrase'. Certificate type containers must hold a 'certificate', but may optionally hold any or all of 'private_key', 'private_key_passphrase', and 'intermediates'.</para>
+			<para>This method creates anew container.</para>
+			<para>Note: The POST request creates a container.</para>
 		</wadl:doc>
 		<request>
-			<param name="marker" style="plain" type="xsd:string"
-				required="false">
-				<wadl:doc xmlns="http://docbook.org/ns/docbook"
-					xml:lang="EN"> Specifies the name of the last
-					queue received in a previous request, or none to
-					get the first page of results. </wadl:doc>
-			</param>
-			<param name="limit" style="plain" type="xsd:integer"
-				required="false">
-				<wadl:doc xmlns="http://docbook.org/ns/docbook"
-					xml:lang="EN"> Specifies the number of queues to
-					return. The default value for the number of queues
-					returned is 10. If you do not specify this
-					parameter, the default number of queues is
-					returned. </wadl:doc>
-			</param>
-			<param name="detailed" style="plain" type="xsd:boolean"
-				required="false">
-				<wadl:doc xmlns="http://docbook.org/ns/docbook"
-					xml:lang="EN"> Determines whether queue metadata
-					is included in the response. The default value for
-					this parameter is <code>false</code>, which
-					excludes the metadata. </wadl:doc>
-			</param>
+			<representation mediaType="application/json">
+				<wadl:doc xml:lang="en">
+					<xsdxt:code href="../wadl/samples/reqCreateContainer.json"/>
+				</wadl:doc>
+				<param name="name"
+					style="plain"
+					type="string"
+					path="$.name"
+					required="false">
+					<wadl:doc xmlns="http://docbook.org/ns/docbook"
+						xml:lang="EN"> Human readable name for the container. If a name is not supplied, the UUID will be displayed for this field on subsequent GET calls.
+					</wadl:doc>
+				</param>
+				<param name="type" style="plain" type="string"
+					required="false" path="$.type">
+					<wadl:doc xmlns="http://docbook.org/ns/docbook"
+						xml:lang="EN"> Specifies the The type of the container. Type can be "generic", "rsa", or "certificate". The "generic" type containers can store multiple arbitrary named references to secrets; "rsa" type can store 3 references, one each named "public_key", "private_key" and "private_key_passphrase"; "certificate" type must hold a "certificate", but may optionally hold any or all of "private_key", "private_key_passphrase", and "intermediates". </wadl:doc>
+				</param>
+				<param name="secret_refs" style="plain" type="string"
+					required="false" path="$.secret_refs">
+					<wadl:doc xmlns="http://docbook.org/ns/docbook"
+						xml:lang="EN"> Specifies an array of secret references.
+					</wadl:doc>
+				</param>
+			</representation>
+		</request>
+		<response status="201">
+			<doc title="Success">This status code is returned when the
+				secret has been successfully created.</doc>
 			<representation mediaType="application/json">
 				<doc>
-					<xsdxt:code href="../wadl/samples/reqUpdateOrder.json"/>
+					<xsdxt:code href="../wadl/samples/resCreateContainer.json"/>
+				</doc>
+			</representation>
+		</response>
+		<response status="400">
+			<doc title="Error">This error code is returned if the
+				secret has invalid data. This response may include
+				schema violations such as mime-type not specified.
+			</doc>
+		</response>
+		<response status="400">
+			<doc title="Error">This error code is returned if the
+				"payload" parameter is empty. This response indicates
+				that the 'payload' JSON attribute was provided, but no
+				value was assigned to it.</doc>
+		</response>
+		<response status="400">
+			<doc title="Error">This error code is returned if the
+				value specified in the "payload_content_type"
+				parameter is not supported. It is caused when no
+				crypto plugin supports the payload_content_type
+				requested </doc>
+		</response>
+		<response status="415">
+			<doc title="Error">This error code is returned when the
+				secret specified in the "payload" parameter is too
+				large. </doc>
+		</response>
+	</method>
+<!--*******************************************************-->
+<!--               Get Container Information: getContainerInfo               -->
+<!--*******************************************************-->
+<method name="GET" id="getContainerinfo">
+	<wadl:doc xml:lang="EN" title="Get Container Information"
+		xmlns="http://docbook.org/ns/docbook">
+		<para role="shortdesc">This method retrieves information about a specified container.</para>
+		<para>This method retrieves information for the specified order including g a link to the secret that was stored as a result of the order (if available).</para>
+	</wadl:doc>
+	<request>
+		<representation mediaType="application/json">
+			<doc>
+				<xsdxt:code href="../wadl/samples/reqGetContainers.json"/>
+			</doc>
+		</representation>
+	</request>
+	<response status="200">
+		<doc title="Success">This status code is returned when the
+			order info was successfully retrieved.</doc>
+		<representation mediaType="application/json">
+			<doc>
+				<xsdxt:code href="../wadl/samples/resGetContainers.json"/>
+			</doc>
+		</representation>
+	</response>
+	<response status="404">
+		<doc title="Error">This error code is returned when the
+			supplied UUID doesn't match an order in the data store,
+			which means the order doesn't exist. </doc>
+	</response>
+</method>
+	<!--*******************************************************-->
+	<!--               Get Container Information: getContainer              -->
+	<!--*******************************************************-->
+	<method name="GET" id="getContainer">
+		<wadl:doc xml:lang="EN" title="Get Container"
+			xmlns="http://docbook.org/ns/docbook">
+			<para role="shortdesc">This method retrieves information about a specified container.</para>
+			<para>This method retrieves information for the specified order including g a link to the secret that was stored as a result of the order (if available).</para>
+		</wadl:doc>
+		<request>
+			<representation mediaType="application/json">
+				<doc>
+					<xsdxt:code href="../wadl/samples/reqGetContainers.json"/>
 				</doc>
 			</representation>
 		</request>
 		<response status="200">
+			<doc title="Success">This status code is returned when the
+				order info was successfully retrieved.</doc>
 			<representation mediaType="application/json">
 				<doc>
-					<xsdxt:code href="../wadl/samples/resUpdateOrder.json"/>
+					<xsdxt:code href="../wadl/samples/resGetContainers.json"/>
 				</doc>
 			</representation>
 		</response>
+		<response status="404">
+			<doc title="Error">This error code is returned when the
+				supplied UUID doesn't match an order in the data store,
+				which means the order doesn't exist. </doc>
+		</response>
 	</method>
-	
 </application>
