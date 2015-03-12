@@ -211,13 +211,6 @@
             </programlisting>
           </programlistingco>
         </example>
-        <note>
-          <para>The information shown in the authentication response
-            example is for US-based accounts. If you authenticate
-            against the UK endpoint, the response you receive shows
-            the service catalog information for UK-based
-            accounts.</para>
-        </note>
         <calloutlist>
           <callout arearefs="response.json.token">
             <para>This token can be presented to a service as evidence

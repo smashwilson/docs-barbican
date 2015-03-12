@@ -447,11 +447,6 @@
                 <code>v2.0</code> component in the URL indicates that
             you are using version 2.0 of the Cloud Identity
             API.</para>
-        <note>
-            <para>For UK-based accounts, you can use
-                    <code>https://lon.identity.api.rackspacecloud.com/v2.0/tokens</code>
-                instead.</para>
-        </note>
         <example>
             <title>cURL authenticate request: XML</title>
             <?dbfo keep-together="always"?>
@@ -506,15 +501,6 @@
                         <para>The values that you receive in your
                             response vary because they are specific to
                             your account.</para>
-                    </listitem>
-                    <listitem>
-                        <para>The information shown in the
-                            authentication request examples above is
-                            for US-based accounts. If you authenticate
-                            against the UK-endpoint for the
-                            authorization service, you see the service
-                            catalog information for UK-based
-                            accounts.</para>
                     </listitem>
                     <listitem>
                         <para> The <code>expires</code> attribute
