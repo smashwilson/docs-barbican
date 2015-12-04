@@ -13,7 +13,7 @@ Before running the examples, review the :ref:`Cloud Keep concepts <barbican-dg-c
 For more information about all Cloud Keep operations, see the
 :ref:`API reference <api-reference>`.
 
-.. include:: ../getting-started/store-a-secret.rst
-.. include:: ../getting-started/retrieve-a-secret.rst
-.. include:: ../getting-started/retrieve-list-of-secrets.rst
-.. include:: ../getting-started/two-step-secret-creation.rst
+.. include:: examples/store-a-secret.rst
+.. include:: examples/retrieve-a-secret.rst
+.. include:: examples/retrieve-list-of-secrets.rst
+.. include:: examples/two-step-secret-creation.rst
